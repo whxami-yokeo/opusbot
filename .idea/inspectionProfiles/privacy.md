@@ -1,0 +1,58 @@
+# Privacy Policy for [Opus]
+
+**Last updated:** [August, 11, 2026]
+
+[Opus] (“the Bot,” "the bot," "bot," “we,” “us,” or “our”) is a Discord bot operated by [Eddie Menard].
+
+## 1. Data We Process
+
+The Bot sends direct messages to Discord users in order to provide its intended functionality.
+
+To deliver these messages, the Bot may process the following Discord-provided data:
+
+- Discord user ID
+- Discord username and display name
+- Discord server or channel identifiers, where needed to determine who should receive a message
+- Information required to determine whether and when a direct message should be sent
+- The content of messages sent by the Bot
+- The amount of messages total you have sent in the server with the bot
+
+## 2. How We Use Data
+
+We use this information only to operate the Bot and send direct messages requested by, consented to by, or otherwise necessary for the Bot’s stated functionality.
+
+We do not use Discord data for advertising, marketing, profiling, selling data, or training artificial-intelligence models.
+
+## 3. Data Storage and Retention
+
+The Bot stores username information for DM sequencing, only for as long as necessary to operate the Bot. This data is deleted after the user leaves/is kicked/is banned from the server for any reason.
+
+## 4. Sharing of Data
+
+We do not sell, rent, trade, or disclose Discord user data to third parties.
+
+The Bot uses Discord’s services to send direct messages.
+
+## 5. Your Choices and Data Deletion
+
+You may stop receiving messages from the Bot by leaving the servers where the bot is present in.
+
+## 6. Security
+
+We take reasonable measures to protect data processed by the Bot. However, no online service can guarantee absolute security.
+
+## 7. Children
+
+The Bot is not directed to children under the minimum age required to use Discord in their jurisdiction. We do not knowingly collect personal information from children.
+
+## 8. Changes to This Policy
+
+We may update this Privacy Policy when the Bot’s data practices change. The latest version will be available at this URL, and the “Last updated” date will be revised.
+
+## 9. Contact
+
+For privacy questions or requests, contact:
+
+[Eddie Menard]  
+[yours.truly.official@icloud.com]  
+[https://discord.gg/E6RQxp2xzK]
