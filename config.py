@@ -1,0 +1,1 @@
+# config.pyimport discorddef is_admin(member: discord.Member) -> bool:    """Check for Administrator permission (covers most admin roles)."""    return member.guild_permissions.administratordef is_owner(member: discord.Member, bot: discord.Client) -> bool:    """Check if member is bot owner (via Discord app owner or team)."""    return member.id in bot.owner_ids

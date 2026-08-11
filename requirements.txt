@@ -1,0 +1,1 @@
+discord.py>=2.7.1python-dotenv>=1.2.2aiosqlite>=0.22.1pynacl>=1.6.2davey>=0.1.6
