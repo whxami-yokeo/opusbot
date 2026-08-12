@@ -7,9 +7,9 @@
 
 ## Overview
 
-OpusBot is a <Discord/Telegram/web/CLI/etc.> bot that sends DM based on server activity or roles.
+OpusBot is a Discord Bot that sends pre-set DMs based on server activity or roles.
 
-It is built with <python/discord.py> and provides:
+It is built with python/discord.py and provides:
 
 - DM Sequencing
 - Embed Generation
