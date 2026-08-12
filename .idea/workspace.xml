@@ -8,8 +8,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dd09f48d-d144-462f-b7d7-34aa51d3c938" name="Changes" comment="published">
-      <change afterPath="$PROJECT_DIR$/LICENSE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,18 +31,18 @@
     <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "whxami-yokeo"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;whxami-yokeo&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/whxami-yokeo/opusbot.git",
-    "accountId": "b8451b94-521c-4b06-9d8c-9becd28df32a"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/whxami-yokeo/opusbot.git&quot;,
+    &quot;accountId&quot;: &quot;b8451b94-521c-4b06-9d8c-9becd28df32a&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/cogs/events.py" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -54,23 +52,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000061116781431" />
-      <entry key="MS500" value="1.0907486092242629" />
-      <entry key="S2" value="1.7294927047139035" />
-      <entry key="S5" value="2.7961136140231737" />
-      <entry key="S10" value="4.1659761507504385" />
-      <entry key="S30" value="9.184208661821408" />
-      <entry key="S60" value="14.461212670155472" />
-      <entry key="M2" value="21.489489464278144" />
-      <entry key="M5" value="34.57135609684161" />
-      <entry key="M10" value="44.60021930166296" />
-      <entry key="M15" value="49.32095112932842" />
-      <entry key="M30" value="55.03651042256235" />
-      <entry key="H1" value="59.620638218606096" />
-      <entry key="H2" value="89.47321874587826" />
-      <entry key="H4" value="213.1644597830005" />
-      <entry key="D1" value="744.4289947230898" />
-      <entry key="W1" value="973.524627979677" />
+      <entry key="MS100" value="1.0001055343299936" />
+      <entry key="MS500" value="1.1602059905200242" />
+      <entry key="S2" value="1.6326996453663893" />
+      <entry key="S5" value="1.8571377576466666" />
+      <entry key="S10" value="2.1346351166240582" />
+      <entry key="S30" value="3.8554502100200603" />
+      <entry key="S60" value="7.975339125463383" />
+      <entry key="M2" value="15.788132542292482" />
+      <entry key="M5" value="31.360624738266193" />
+      <entry key="M10" value="43.70876587041179" />
+      <entry key="M15" value="49.65258735366008" />
+      <entry key="M30" value="56.95407062984857" />
+      <entry key="H1" value="62.48308996205979" />
+      <entry key="H2" value="92.61878626609918" />
+      <entry key="H4" value="216.14860590591005" />
+      <entry key="D1" value="747.8378648628606" />
+      <entry key="W1" value="977.4141781809509" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -78,37 +76,37 @@
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
       <entry key="S10" value="0.0" />
-      <entry key="S30" value="2.82402069709865E-229" />
-      <entry key="S60" value="1.142523284262689E-114" />
-      <entry key="M2" value="2.6314021933535713E-57" />
-      <entry key="M5" value="7.368074755796848E-23" />
-      <entry key="M10" value="2.3218894829465744E-11" />
-      <entry key="M15" value="1.673063287295556E-7" />
-      <entry key="M30" value="0.0015839310200030606" />
-      <entry key="H1" value="0.24554298140490272" />
-      <entry key="H2" value="4.18748014210904" />
-      <entry key="H4" value="20.632166000487782" />
-      <entry key="D1" value="108.04001883069932" />
-      <entry key="W1" value="153.3623237320654" />
+      <entry key="S30" value="2.871846734297218E-230" />
+      <entry key="S60" value="3.6434410846323296E-115" />
+      <entry key="M2" value="1.4859718358883632E-57" />
+      <entry key="M5" value="5.862506832192135E-23" />
+      <entry key="M10" value="2.071124535527069E-11" />
+      <entry key="M15" value="1.5503228527528744E-7" />
+      <entry key="M30" value="0.0015247237104609528" />
+      <entry key="H1" value="0.2409100787804685" />
+      <entry key="H2" value="4.147787352081596" />
+      <entry key="H4" value="20.534147843517115" />
+      <entry key="D1" value="107.95430390850618" />
+      <entry key="W1" value="153.3449361121819" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.8950305790807265" />
-      <entry key="MS500" value="1.066943829044222" />
-      <entry key="S2" value="1.7200668584040704" />
-      <entry key="S5" value="2.790030399470584" />
-      <entry key="S10" value="4.1611100272426516" />
-      <entry key="S30" value="9.179736854772106" />
-      <entry key="S60" value="14.457595387348722" />
-      <entry key="M2" value="21.486773986594052" />
-      <entry key="M5" value="34.56942066321506" />
-      <entry key="M10" value="44.59887676563144" />
-      <entry key="M15" value="49.31993359345225" />
-      <entry key="M30" value="55.03750761744106" />
-      <entry key="H1" value="59.8656379342453" />
-      <entry key="H2" value="93.65843505958966" />
-      <entry key="H4" value="233.79131846249362" />
-      <entry key="D1" value="852.464565261251" />
-      <entry key="W1" value="1126.8860601954225" />
+      <entry key="MS100" value="0.7023175507327266" />
+      <entry key="MS500" value="1.0886494282151036" />
+      <entry key="S2" value="1.6118942997993915" />
+      <entry key="S5" value="1.847374456887121" />
+      <entry key="S10" value="2.1262301589915724" />
+      <entry key="S30" value="3.8482737669348794" />
+      <entry key="S60" value="7.969746798739869" />
+      <entry key="M2" value="15.784031896817272" />
+      <entry key="M5" value="31.35796214918272" />
+      <entry key="M10" value="43.706989916976255" />
+      <entry key="M15" value="49.651254972103246" />
+      <entry key="M30" value="56.954833836176164" />
+      <entry key="H1" value="62.723368172934364" />
+      <entry key="H2" value="96.76428169771889" />
+      <entry key="H4" value="236.67744683561776" />
+      <entry key="D1" value="855.787719869177" />
+      <entry key="W1" value="1130.7582222865317" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -119,36 +117,38 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.Bot.executor": "Run",
-    "Python.bot.executor": "Run",
-    "Python.core.executor": "Run",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.jshint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.jshint": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.Bot.executor&quot;: &quot;Run&quot;,
+    &quot;Python.bot.executor&quot;: &quot;Run&quot;,
+    &quot;Python.core.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git.auto.fetch.suggestion.counter&quot;: &quot;1&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/eddie/PycharmProjects/OpusBot&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.jshint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.jshint&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "stardust.markdown.MarkdownSplitEditorSuppressor:keyList": []
+  &quot;keyToStringList&quot;: {
+    &quot;stardust.markdown.MarkdownSplitEditorSuppressor:keyList&quot;: []
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Bot" type="PythonConfigurationType" factoryName="Python">
       <module name="OpusBot" />
@@ -231,7 +231,15 @@
       <option name="project" value="LOCAL" />
       <updated>1786509083869</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="published">
+      <option name="closed" value="true" />
+      <created>1786509993418</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1786509993418</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
