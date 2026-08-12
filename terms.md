@@ -1,15 +1,15 @@
-# Terms of Service for [Opus]
+# Terms of Service for Opus
 
-**Effective date:** [August, 11, 2026]  
-**Last updated:** [August, 11, 2026]
+**Effective date:** August, 11, 2026
+**Last updated:** August, 11, 2026
 
-These Terms of Service (“Terms”) govern your use of [Opus] (“the Bot”), a Discord application operated by [Eddie Menard] (“we,” “us,” or “our”).
+These Terms of Service (“Terms”) govern your use of Opus (“the Bot”), a Discord application operated by Eddie Menard (“we,” “us,” or “our”).
 
 By adding, using, interacting with, or receiving direct messages from the Bot, you agree to these Terms.
 
 ## 1. The Bot’s Service
 
-[Opus] provides dm sequencing through Discord, including sending direct messages to users who have DMs enable.
+Opus provides DM sequencing through Discord, including sending direct messages to users who have DMs enable.
 
 The Bot is not affiliated with, endorsed by, or sponsored by Discord Inc.
 

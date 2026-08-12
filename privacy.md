@@ -1,8 +1,8 @@
-# Privacy Policy for [Opus]
+# Privacy Policy for Opus
 
-**Last updated:** [August, 11, 2026]
+**Last updated:** August, 11, 2026
 
-[Opus] ("the Bot," "the bot," "bot," "we," "us," or "our") is a Discord bot operated by [Eddie Menard].
+[Opus] ("the Bot," "the bot," "bot," "we," "us," or "our") is a Discord bot operated by Eddie Menard.
 
 ## 1. Data We Process
 
@@ -53,6 +53,6 @@ We may update this Privacy Policy when the Bot's data practices change. The late
 
 For privacy questions or requests, contact:
 
-[Eddie Menard]  
-[yours.truly.official@icloud.com]  
-[https://discord.gg/E6RQxp2xzK]
+Eddie Menard\
+yours.truly.official@icloud.com\
+https://discord.gg/E6RQxp2xzK
