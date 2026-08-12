@@ -1,4 +1,4 @@
-# OpusBot
+# Opus
 
 > Opus is a Discord Bot used for DM sequencing on a trading server.
 
