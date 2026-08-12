@@ -2,7 +2,7 @@
 
 > Opus is a Discord Bot used for DM sequencing on a trading server.
 
-[![License](https://img.shields.io/github/license/whxami-yokeo/opusbot)](LICENSE.md)
+[![License: Custom](https://img.shields.io/github/license/whxami-yokeo/opusbot)](LICENSE.md)
 [![Last commit](https://img.shields.io/github/last-commit/whxami-yokeo/opusbot)](https://github.com/whxami-yokeo/opusbot/commits/main)
 
 ## Overview
