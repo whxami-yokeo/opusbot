@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from database import init_db
 
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN", "").strip()
 DEV_GUILD_ID = int(os.getenv("DEV_GUILD_ID") or 0)
 
 logging.basicConfig(level=logging.INFO)

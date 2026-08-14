@@ -94,12 +94,13 @@ class EventCog(commands.Cog, name="Events"):
                 description=(
                     f"Hey, {member.mention}! Welcome in — really glad you're here.\n\n"
                     "I'm Isaac. I built this space for traders who are serious about getting better, whether you're just starting out or you've been at it a while.\n\n"
-                    "One quick step before you dive in: click the free link I sent earlier to verify your account. Takes about 10 seconds and it unlocks the full server.\n\n"
+                    "One quick step before you dive in: click the free link above to verify your account. Takes about 10 seconds and it unlocks the full server.\n\n"
                     "And as a thank-you for verifying, I'll drop you my free trading guide. It's the same foundation I'd want every new trader here to start from.\n\n"
                     "See you inside."
                 ),
                 color=discord.Color.magenta(),
                 timestamp=datetime.datetime.now(datetime.timezone.utc),
+                url="https://whop.com/joined/big-tick-energy-premium-copy/products/discord-access-c6/"
             )
             embed.set_image(
                 url=(
