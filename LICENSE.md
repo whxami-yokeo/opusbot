@@ -44,5 +44,6 @@ ITS USE.
 
 For permissions beyond viewing and personal educational study, contact:
 
-Eddie Menard
-yours.truly.official@icloud.com
+Eddie Menard\
+yours.truly.official@icloud.com\
+https://discord.gg/E6RQxp2xzK
