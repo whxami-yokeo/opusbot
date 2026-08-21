@@ -76,7 +76,7 @@ async def log_task_run(task_name: str, details: str = ""):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             "INSERT INTO task_log (task_name, details) VALUES (?, ?)",
-            (task_name, details)
+            (task_name, details),
         )
 
         await db.commit()
@@ -89,7 +89,7 @@ async def start_dm_sequence(
     total_messages: int = 5,
 ) -> bool:
     """
-    Create a DM sequence after Day 1 has been sent.
+    Create a DM sequence after Day 1 has successfully been sent.
 
     Returns True if a new sequence was created.
     Returns False if that user already has a sequence record.
@@ -123,8 +123,35 @@ async def start_dm_sequence(
 
         await db.commit()
 
-        # True means the database inserted a new sequence.
         return cursor.rowcount == 1
+
+
+async def has_dm_sequence(
+    guild_id: int,
+    user_id: int,
+) -> bool:
+    """
+    Return True if this member has ever had a DM sequence record in this guild.
+
+    This includes active, completed, and cancelled sequences. That behavior
+    prevents the backfill task from restarting old sequences or re-sending Day 1.
+    """
+
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute("""
+            SELECT 1
+            FROM dm_sequences
+            WHERE guild_id = ?
+              AND user_id = ?
+            LIMIT 1
+        """, (
+            str(guild_id),
+            str(user_id),
+        ))
+
+        row = await cursor.fetchone()
+
+        return row is not None
 
 
 async def get_due_dm_sequences() -> list[dict]:

@@ -8,6 +8,7 @@ from database import (
     increment_user_message,
     log_task_run,
     start_dm_sequence,
+    has_dm_sequence,
     get_due_dm_sequences,
     mark_dm_sequence_sent,
     cancel_dm_sequence,
@@ -20,6 +21,7 @@ CHAT_CHANNEL_ID = 1214705314826559540
 
 TOTAL_SEQUENCE_DMS = 5
 DM_SEQUENCE_CHECK_MINUTES = 15
+VERIFIED_DM_BACKFILL_HOURS = 6
 
 
 class EventCog(commands.Cog, name="Events"):
@@ -28,19 +30,21 @@ class EventCog(commands.Cog, name="Events"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.process_dm_sequences.start()
+        self.backfill_verified_dm_sequences.start()
         self.auto_cleanup.start()
 
     def cog_unload(self):
         """Stop background loops cleanly when the cog unloads."""
         self.process_dm_sequences.cancel()
+        self.backfill_verified_dm_sequences.cancel()
         self.auto_cleanup.cancel()
 
     def build_sequence_embed(
-            self,
-            member: discord.Member,
-            day: int,
-            title: str,
-            description: str,
+        self,
+        member: discord.Member,
+        day: int,
+        title: str,
+        description: str,
     ) -> discord.Embed:
         embed = discord.Embed(
             title=title,
@@ -60,6 +64,138 @@ class EventCog(commands.Cog, name="Events"):
         )
 
         return embed
+
+    async def send_day_one_and_start_sequence(
+        self,
+        member: discord.Member,
+        source: str,
+    ) -> bool:
+        """
+        Send Day 1 and then create the database sequence record.
+
+        A database record is only created after the DM sends successfully.
+        This prevents users with closed DMs from being incorrectly marked as
+        having received Day 1.
+
+        Returns True only if Day 1 was sent and a new sequence was created.
+        """
+
+        if member.bot:
+            return False
+
+        has_verified_role = any(
+            role.id == VERIFIED_ROLE_ID
+            for role in member.roles
+        )
+
+        has_paid_role = any(
+            role.id == PAID_SUBSCRIPTION_ROLE_ID
+            for role in member.roles
+        )
+
+        if not has_verified_role:
+            return False
+
+        if has_paid_role:
+            return False
+
+        sequence_exists = await has_dm_sequence(
+            guild_id=member.guild.id,
+            user_id=member.id,
+        )
+
+        if sequence_exists:
+            logging.info(
+                "DM sequence already exists for %s; source=%s.",
+                member,
+                source,
+            )
+            return False
+
+        chat = member.guild.get_channel(CHAT_CHANNEL_ID)
+
+        if chat is None:
+            logging.error(
+                "Cannot start DM sequence for %s: channel %s was not found.",
+                member.id,
+                CHAT_CHANNEL_ID,
+            )
+            return False
+
+        first_sequence_embed = self.build_sequence_embed(
+            member=member,
+            day=1,
+            title="🎉 You're Officially Verified!",
+            description=(
+                f"Hey {member.mention} — thanks for verifying! You're all set "
+                "and the full server is open to you now.\n\n"
+                "As promised, here's your free trading guide. Give it a read "
+                "when you get a chance.\n\n"
+                "Quick question to kick things off: where are you at with "
+                "futures trading right now? Still learning the basics, actively "
+                "trading, or somewhere in between? No wrong answer — just want "
+                "to make sure you get the most out of being here.\n\n"
+                f"Let me know in {chat.mention}."
+            ),
+        )
+
+        first_sequence_embed.set_image(
+            url=(
+                "https://cdn.discordapp.com/attachments/1054139443344310442/"
+                "1535459972022935663/BTE_Lvl1_Guide.png"
+                "?ex=6a77d808&is=6a768688"
+                "&hm=78a311aa9cb5c71383fb044f4c3e95ec51b4f559533f3aa5ad0dfc2cfe1eb7f9&"
+            )
+        )
+
+        try:
+            await member.send(embed=first_sequence_embed)
+
+        except discord.Forbidden:
+            logging.info(
+                "Could not send Day 1 DM to %s; their DMs are disabled.",
+                member,
+            )
+            return False
+
+        except discord.HTTPException as error:
+            logging.error(
+                "Discord failed to send Day 1 to %s: %s",
+                member,
+                error,
+                exc_info=True,
+            )
+            return False
+
+        sequence_started = await start_dm_sequence(
+            guild_id=member.guild.id,
+            user_id=member.id,
+            messages_sent=1,
+            total_messages=TOTAL_SEQUENCE_DMS,
+        )
+
+        if not sequence_started:
+            logging.warning(
+                "Day 1 was sent to %s, but the sequence already existed. "
+                "Source=%s.",
+                member,
+                source,
+            )
+            return False
+
+        await log_task_run(
+            "dm_sequence_started",
+            f"Started verified DM sequence for {member} "
+            f"in {member.guild.name}; source={source}",
+        )
+
+        logging.info(
+            "✅ Started Day 1 DM sequence for %s; source=%s.",
+            member,
+            source,
+        )
+
+        return True
 
     # ───────────────────────────────────────
     # EVENT LISTENERS
@@ -93,16 +229,27 @@ class EventCog(commands.Cog, name="Events"):
                 title=f"🎉 Welcome to {member.guild.name}!",
                 description=(
                     f"Hey, {member.mention}! Welcome in — really glad you're here.\n\n"
-                    "I'm Isaac. I built this space for traders who are serious about getting better, whether you're just starting out or you've been at it a while.\n\n"
-                    "One quick step before you dive in: click the free link above to verify your account. Takes about 10 seconds and it unlocks the full server.\n\n"
-                    "And as a thank-you for verifying, I'll drop you my free trading guide. It's the same foundation I'd want every new trader here to start from.\n\n"
+                    "I'm Isaac. I built this space for traders who are serious "
+                    "about getting better, whether you're just starting out or "
+                    "you've been at it a while.\n\n"
+                    "One quick step before you dive in: click the free link above "
+                    "to verify your account. Takes about 10 seconds and it "
+                    "unlocks the full server.\n\n"
+                    "And as a thank-you for verifying, I'll drop you my free "
+                    "trading guide. It's the same foundation I'd want every new "
+                    "trader here to start from.\n\n"
                     "See you inside.\n\n"
-                    "https://whop.com/joined/big-tick-energy-premium-copy/products/discord-access-c6/"
+                    "https://whop.com/joined/big-tick-energy-premium-copy/"
+                    "products/discord-access-c6/"
                 ),
                 color=discord.Color.magenta(),
                 timestamp=datetime.datetime.now(datetime.timezone.utc),
-                url="https://whop.com/joined/big-tick-energy-premium-copy/products/discord-access-c6/"
+                url=(
+                    "https://whop.com/joined/big-tick-energy-premium-copy/"
+                    "products/discord-access-c6/"
+                ),
             )
+
             embed.set_image(
                 url=(
                     "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3"
@@ -136,9 +283,9 @@ class EventCog(commands.Cog, name="Events"):
 
     @staticmethod
     async def cleanup_departed_member(
-            guild: discord.Guild,
-            user: discord.abc.User,
-            removal_type: str,
+        guild: discord.Guild,
+        user: discord.abc.User,
+        removal_type: str,
     ):
         """Delete stored user data after a leave, kick, or ban."""
         try:
@@ -150,8 +297,8 @@ class EventCog(commands.Cog, name="Events"):
             await log_task_run(
                 "member_data_removed",
                 (
-                    f"{user.mention}({user.name}) ({user.id}) was removed from {guild.name} "
-                    f"({guild.id}) via {removal_type}. "
+                    f"{user.mention} ({user.name}) ({user.id}) was removed "
+                    f"from {guild.name} ({guild.id}) via {removal_type}. "
                     f"Deleted: dm_sequences={deleted['dm_sequences']}, "
                     f"users={deleted['users']}, "
                     f"premium_users={deleted['premium_users']}"
@@ -180,9 +327,7 @@ class EventCog(commands.Cog, name="Events"):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
-        """
-        Fires when a member leaves, is kicked, or is banned.
-        """
+        """Fires when a member leaves, is kicked, or is banned."""
         await self.cleanup_departed_member(
             guild=member.guild,
             user=member,
@@ -191,15 +336,15 @@ class EventCog(commands.Cog, name="Events"):
 
     @commands.Cog.listener()
     async def on_member_ban(
-            self,
-            guild: discord.Guild,
-            user: discord.User,
+        self,
+        guild: discord.Guild,
+        user: discord.User,
     ):
         """
         Backup cleanup for bans.
 
         A ban can also produce on_member_remove, so this may run after the
-        first deletion. That is fine because remove_departed_user is idempotent.
+        first deletion. remove_departed_user is safe to run more than once.
         """
         await self.cleanup_departed_member(
             guild=guild,
@@ -209,13 +354,13 @@ class EventCog(commands.Cog, name="Events"):
 
     @commands.Cog.listener()
     async def on_member_update(
-            self,
-            before: discord.Member,
-            after: discord.Member,
+        self,
+        before: discord.Member,
+        after: discord.Member,
     ):
         """
         Start the verified-user DM sequence when VERIFIED_ROLE_ID is newly added.
-        Do not start or continue sequences for users with the paid role.
+        Stop future sequence DMs when the paid role is added.
         """
 
         had_verified_role = any(
@@ -257,11 +402,11 @@ class EventCog(commands.Cog, name="Events"):
             )
             return
 
-        # Continue only if the verified role was just added.
+        # Only begin Day 1 if verified was newly added.
         if had_verified_role or not has_verified_role:
             return
 
-        # Never start a sequence for an already-paid member.
+        # Never begin a sequence for an already-paid member.
         if has_paid_role:
             await log_task_run(
                 "dm_sequence_skipped_paid",
@@ -275,92 +420,10 @@ class EventCog(commands.Cog, name="Events"):
             )
             return
 
-        # Create DB record first. This should store messages_sent=1 and schedule
-        # the next message for your desired delay in database.py.
-        sequence_started = await start_dm_sequence(
-            guild_id=after.guild.id,
-            user_id=after.id,
-            messages_sent=1,
-            total_messages=TOTAL_SEQUENCE_DMS,
+        await self.send_day_one_and_start_sequence(
+            member=after,
+            source="verified_role_added",
         )
-
-        if not sequence_started:
-            logging.info(
-                "DM sequence already exists for %s — skipping duplicate Day 1.",
-                after,
-            )
-            return
-
-        try:
-            chat = after.guild.get_channel(CHAT_CHANNEL_ID)
-
-            if chat is None:
-                await cancel_dm_sequence(
-                    guild_id=after.guild.id,
-                    user_id=after.id,
-                )
-
-                logging.error(
-                    "DM sequence cancelled for %s: channel %s was not found.",
-                    after.id,
-                    CHAT_CHANNEL_ID,
-                )
-                return
-
-            first_sequence_embed = self.build_sequence_embed(
-                member=after,
-                day=1,
-                title="🎉 You're Officially Verified!",
-                description=(
-                    f"Hey {after.mention} — thanks for verifying! You're all set and the full server is open to you now.\n\n"
-                    "As promised, here's your free trading guide. Give it a read when you get a chance.\n\n"
-                    "Quick question to kick things off: where are you at with futures trading right now? Still learning the basics, actively trading, or somewhere in between? No wrong answer — just want to make sure you get the most out of being here.\n\n"
-                    f"Let me know in {chat.mention}."
-                ),
-            )
-            first_sequence_embed.set_image(
-                url="https://cdn.discordapp.com/attachments/1054139443344310442/1535459972022935663/BTE_Lvl1_Guide.png?ex=6a77d808&is=6a768688&hm=78a311aa9cb5c71383fb044f4c3e95ec51b4f559533f3aa5ad0dfc2cfe1eb7f9&")
-            first_sequence_embed.set_footer(
-                text="Only Funds - Opus @ 2026",
-                icon_url=self.bot.user.display_avatar.url if self.bot.user else None,
-            )
-
-            await after.send(embed=first_sequence_embed)
-
-            await log_task_run(
-                "dm_sequence_started",
-                f"Started verified DM sequence for {after} "
-                f"in {after.guild.name}",
-            )
-
-            logging.info(
-                "✅ Started Day 1 DM sequence for %s",
-                after,
-            )
-
-        except discord.Forbidden:
-            await cancel_dm_sequence(
-                guild_id=after.guild.id,
-                user_id=after.id,
-            )
-
-            logging.info(
-                "Could not DM %s; cancelled their sequence.",
-                after,
-            )
-
-        except Exception as error:
-            await cancel_dm_sequence(
-                guild_id=after.guild.id,
-                user_id=after.id,
-            )
-
-            logging.error(
-                "Failed to start DM sequence for %s: %s",
-                after.id,
-                error,
-                exc_info=True,
-            )
 
     # ───────────────────────────────────────
     # DM SEQUENCE BACKGROUND TASK
@@ -371,10 +434,10 @@ class EventCog(commands.Cog, name="Events"):
         """
         Poll the database for active sequences that are due.
 
-        The send interval (e.g. 1 day) is controlled in database.py:
-        - start_dm_sequence() sets the first next_send_at time.
-        - mark_dm_sequence_sent() sets the next next_send_at time.
-        - get_due_dm_sequences() returns only records whose next_send_at is due.
+        The send interval is controlled in database.py:
+        - start_dm_sequence() schedules Day 2 for 24 hours later.
+        - mark_dm_sequence_sent() schedules each later message.
+        - get_due_dm_sequences() returns records whose next_send_at is due.
         """
         try:
             due_sequences = await get_due_dm_sequences()
@@ -415,9 +478,11 @@ class EventCog(commands.Cog, name="Events"):
                 if member is None:
                     try:
                         member = await guild.fetch_member(user_id)
+
                     except discord.NotFound:
                         logging.info(
-                            "Sequence %s cancelled: user %s is no longer in guild %s.",
+                            "Sequence %s cancelled: user %s is no longer in "
+                            "guild %s.",
                             sequence_id,
                             user_id,
                             guild_id,
@@ -469,31 +534,65 @@ class EventCog(commands.Cog, name="Events"):
                     2: {
                         "title": "",
                         "description": (
-                            f"Hey {member.mention} — hope you've had a chance to look around the server a bit. Wanted to drop something useful in your lap right away.\n\n"
-                            "One of the biggest mistakes I see newer futures traders make is jumping into trades without having their daily levels mapped out first. Levels give you your roadmap for the day — without them, you're basically navigating blind.\n\n"
-                            "This week I've been sharing my levels in the premium community. Whether you're building out your own or following mine, it's one of the simplest habits that can tighten up your trading fast."
+                            f"Hey {member.mention} — hope you've had a chance "
+                            "to look around the server a bit. Wanted to drop "
+                            "something useful in your lap right away.\n\n"
+                            "One of the biggest mistakes I see newer futures "
+                            "traders make is jumping into trades without having "
+                            "their daily levels mapped out first. Levels give "
+                            "you your roadmap for the day — without them, you're "
+                            "basically navigating blind.\n\n"
+                            "This week I've been sharing my levels in the premium "
+                            "community. Whether you're building out your own or "
+                            "following mine, it's one of the simplest habits "
+                            "that can tighten up your trading fast."
                         ),
                     },
                     3: {
                         "title": "",
                         "description": (
-                            f"{member.mention}, quick story. When I started trading futures, I blew through more than one account before things clicked. Not because I didn't know the setups — but because I had no structure, no discipline, and no one showing me what actually mattered.\n\n"
-                            "What changed everything was having a repeatable process and a community that kept me accountable. That's exactly what I've tried to build here.\n\n"
-                            "If you've had rough stretches, you're not alone — it's part of the path. The traders who make it are the ones who stick with the process."
+                            f"{member.mention}, quick story. When I started "
+                            "trading futures, I blew through more than one "
+                            "account before things clicked. Not because I "
+                            "didn't know the setups — but because I had no "
+                            "structure, no discipline, and no one showing me "
+                            "what actually mattered.\n\n"
+                            "What changed everything was having a repeatable "
+                            "process and a community that kept me accountable. "
+                            "That's exactly what I've tried to build here.\n\n"
+                            "If you've had rough stretches, you're not alone — "
+                            "it's part of the path. The traders who make it are "
+                            "the ones who stick with the process."
                         ),
                     },
                     4: {
                         "title": "",
                         "description": (
-                            f"{member.mention}, wanted to share what's behind the Premium doors in case you're curious. Premium members get my daily levels laid out every morning, live trading sessions where you can watch the process in real time, and the full MasterClass that walks through my entire approach step by step.\n\n"
-                            "It's the difference between watching from the sidelines and actually being in the game with a roadmap. No pressure at all — just want you to know it's there when you're ready to go deeper."
+                            f"{member.mention}, wanted to share what's behind "
+                            "the Premium doors in case you're curious. Premium "
+                            "members get my daily levels laid out every morning, "
+                            "live trading sessions where you can watch the "
+                            "process in real time, and the full MasterClass that "
+                            "walks through my entire approach step by step.\n\n"
+                            "It's the difference between watching from the "
+                            "sidelines and actually being in the game with a "
+                            "roadmap. No pressure at all — just want you to know "
+                            "it's there when you're ready to go deeper."
                         ),
                     },
                     5: {
                         "title": "",
                         "description": (
-                            f"Hey {member.mention} — if you've been thinking about Premium but haven't pulled the trigger, I get it. The two things I hear most are 'is it worth it' and 'will I actually use it.'\n\n"
-                            "Here's my honest take: the members who get the most out of it are the ones who show up to the live sessions and follow the daily levels consistently. It's not magic — it's structure and repetition. If you're willing to show up, it works. And you're not locked in — you can see if it fits and go from there."
+                            f"Hey {member.mention} — if you've been thinking "
+                            "about Premium but haven't pulled the trigger, I "
+                            "get it. The two things I hear most are 'is it worth "
+                            "it' and 'will I actually use it.'\n\n"
+                            "Here's my honest take: the members who get the most "
+                            "out of it are the ones who show up to the live "
+                            "sessions and follow the daily levels consistently. "
+                            "It's not magic — it's structure and repetition. If "
+                            "you're willing to show up, it works. And you're not "
+                            "locked in — you can see if it fits and go from there."
                         ),
                     },
                 }
@@ -539,7 +638,8 @@ class EventCog(commands.Cog, name="Events"):
 
             except discord.Forbidden:
                 logging.info(
-                    "Could not DM user %s for sequence %s; marking sequence complete.",
+                    "Could not DM user %s for sequence %s; marking sequence "
+                    "complete.",
                     sequence.get("user_id"),
                     sequence.get("id"),
                 )
@@ -565,6 +665,131 @@ class EventCog(commands.Cog, name="Events"):
         logging.info("DM sequence processor is ready.")
 
     # ───────────────────────────────────────
+    # VERIFIED DM BACKFILL CHECKER
+    # ───────────────────────────────────────
+
+    @tasks.loop(hours=VERIFIED_DM_BACKFILL_HOURS)
+    async def backfill_verified_dm_sequences(self):
+        """
+        Find verified members who have never received a sequence record.
+
+        This protects against missed on_member_update events, such as when the
+        bot was offline while the verified role was assigned.
+        """
+
+        for guild in self.bot.guilds:
+            verified_role = guild.get_role(VERIFIED_ROLE_ID)
+
+            if verified_role is None:
+                logging.warning(
+                    "Verified role %s was not found in %s.",
+                    VERIFIED_ROLE_ID,
+                    guild.name,
+                )
+                continue
+
+            checked = 0
+            started = 0
+            skipped_paid = 0
+            skipped_existing = 0
+
+            try:
+                async for member in guild.fetch_members(limit=None):
+                    if member.bot:
+                        continue
+
+                    has_verified_role = any(
+                        role.id == VERIFIED_ROLE_ID
+                        for role in member.roles
+                    )
+
+                    if not has_verified_role:
+                        continue
+
+                    has_paid_role = any(
+                        role.id == PAID_SUBSCRIPTION_ROLE_ID
+                        for role in member.roles
+                    )
+
+                    if has_paid_role:
+                        skipped_paid += 1
+                        continue
+
+                    checked += 1
+
+                    sequence_exists = await has_dm_sequence(
+                        guild_id=guild.id,
+                        user_id=member.id,
+                    )
+
+                    if sequence_exists:
+                        skipped_existing += 1
+                        continue
+
+                    try:
+                        did_start = await self.send_day_one_and_start_sequence(
+                            member=member,
+                            source="verified_backfill_checker",
+                        )
+
+                        if did_start:
+                            started += 1
+
+                    except Exception as error:
+                        logging.error(
+                            "Backfill failed for %s in %s: %s",
+                            member.id,
+                            guild.name,
+                            error,
+                            exc_info=True,
+                        )
+
+                details = (
+                    f"{guild.name}: checked={checked}, started={started}, "
+                    f"skipped_existing={skipped_existing}, "
+                    f"skipped_paid={skipped_paid}"
+                )
+
+                await log_task_run(
+                    "verified_dm_backfill_check",
+                    details,
+                )
+
+                logging.info(
+                    "Verified-DM backfill complete: %s",
+                    details,
+                )
+
+            except discord.Forbidden:
+                logging.error(
+                    "Cannot fetch members for %s. Confirm the bot has the "
+                    "Server Members Intent enabled in both the Discord "
+                    "Developer Portal and your bot code.",
+                    guild.name,
+                )
+
+            except discord.HTTPException as error:
+                logging.error(
+                    "Failed to fetch members for %s: %s",
+                    guild.name,
+                    error,
+                    exc_info=True,
+                )
+
+            except Exception as error:
+                logging.error(
+                    "Verified-DM backfill checker failed for %s: %s",
+                    guild.name,
+                    error,
+                    exc_info=True,
+                )
+
+    @backfill_verified_dm_sequences.before_loop
+    async def before_backfill_verified_dm_sequences(self):
+        await self.bot.wait_until_ready()
+        logging.info("Verified DM backfill checker is ready.")
+
+    # ───────────────────────────────────────
     # BACKGROUND TASKS
     # ───────────────────────────────────────
 
@@ -573,6 +798,7 @@ class EventCog(commands.Cog, name="Events"):
         """Log a periodic bot and database health check."""
         try:
             uptime = getattr(self.bot, "uptime", 0)
+
             member_count = sum(
                 guild.member_count or 0
                 for guild in self.bot.guilds
@@ -585,6 +811,7 @@ class EventCog(commands.Cog, name="Events"):
             )
 
             await log_task_run("auto_cleanup", details)
+
             logging.info("🧹 Cleanup task ran: %s", details)
 
         except Exception as error:
